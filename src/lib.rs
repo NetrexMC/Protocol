@@ -1,4 +1,4 @@
 /// Common interfaces, such as blocks, and related.
 pub mod interfaces;
-pub mod packet;
+pub mod game;
 pub mod util;
