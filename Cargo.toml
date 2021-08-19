@@ -1,5 +1,5 @@
 [package]
-name = "protocol"
+name = "mcpe_protocol"
 version = "0.1.0"
 authors = ["Bavfalcon9"]
 edition = "2018"

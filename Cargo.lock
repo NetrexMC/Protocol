@@ -80,6 +80,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "mcpe_protocol"
+version = "0.1.0"
+dependencies = [
+ "binary_utils",
+ "flate2",
+ "rakrs",
+]
+
+[[package]]
 name = "miniz_oxide"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -106,15 +115,6 @@ name = "ppv-lite86"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac74c624d6b2d21f425f752262f42188365d7b8ff1aff74c82e45136510a4857"
-
-[[package]]
-name = "protocol"
-version = "0.1.0"
-dependencies = [
- "binary_utils",
- "flate2",
- "rakrs",
-]
 
 [[package]]
 name = "rakrs"
