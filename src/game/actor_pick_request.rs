@@ -1,5 +1,5 @@
 use crate::util::{ProtocolEncoder, ProtocolDecoder};
-use binary_utils::{BinaryStream, IBinaryStream, IBufferRead, IBufferWrite};
+use binary_utils::{BinaryStream, IBufferRead, IBufferWrite};
 
 pub struct ActorPickRequest {
      pub entity_id: u64,
@@ -7,7 +7,7 @@ pub struct ActorPickRequest {
 }
 
 impl ProtocolEncoder for ActorPickRequest {
-     fn write(&mut self) -> BinaryStream {
+     fn write(&self) -> BinaryStream {
           let mut stream = BinaryStream::new();
           stream.write_ulong(self.entity_id);
           stream.write_byte(self.slot);

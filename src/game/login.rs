@@ -1,4 +1,4 @@
-use binary_utils::{BinaryStream, IBinaryStream, IBufferRead};
+use binary_utils::{BinaryStream, IBufferRead};
 use crate::util::{ProtocolDecoder};
 
 pub struct Login {

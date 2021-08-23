@@ -3,7 +3,7 @@
 [[package]]
 name = "binary_utils"
 version = "0.1.2"
-source = "git+https://github.com/NetrexMC/BinaryUtil?branch=master#bb14e0cef831bb89467b7b5e9ba499984cc4e47b"
+source = "git+https://github.com/NetrexMC/BinaryUtil?branch=master#909ffa62d849f893b562cbf1a8831fa4497288e3"
 
 [[package]]
 name = "mcpe_protocol"

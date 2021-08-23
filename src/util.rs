@@ -1,4 +1,4 @@
-use binary_utils::{BinaryStream, IBufferWrite,};
+use binary_utils::{BinaryStream, IBufferWrite};
 use crate::interfaces::{Vector3, Vector2, Coordinates, Location};
 
 /// A trait to simplify the process
@@ -6,7 +6,7 @@ use crate::interfaces::{Vector3, Vector2, Coordinates, Location};
 pub trait ProtocolEncoder {
      /// Parses a given interface returning
      /// its byte stream as a BinaryStream.
-     fn write(&mut self) -> BinaryStream;
+     fn write(&self) -> BinaryStream;
 }
 
 pub trait ProtocolDecoder {
@@ -43,9 +43,9 @@ impl ProtocolWriter for BinaryStream {
      }
 
      fn write_coordinates(&mut self, coordinates: Coordinates) {
-          self.write_signed_var_long(coordinates.x);
-          self.write_var_int(coordinates.y as isize);
-          self.write_signed_var_long(coordinates.z);
+          self.write_var_long(coordinates.x);
+          self.write_var_long(coordinates.y);
+          self.write_var_long(coordinates.z);
      }
 
      fn write_location(&mut self, location: Location) {
