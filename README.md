@@ -11,4 +11,4 @@ This repository does not serve as a stand-alone server. You should import this i
 We rely on the following:
 
 -  [binary_utils](https://github.com/NetrexMC/BinaryUtil)
-
+-  [glm](https://crates.io/crates/glm) For math related utilities.
