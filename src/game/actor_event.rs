@@ -1,4 +1,4 @@
-use crate::util::{ProtocolEncoder, ProtocolDecoder};
+use crate::util::{ProtocolDecoder, ProtocolEncoder};
 use binary_utils::{BinaryStream, IBufferRead, IBufferWrite};
 use std::convert::TryFrom;
 use std::convert::TryInto;
@@ -58,7 +58,7 @@ pub enum ActorEventType {
      BalloonPop,
      TreasureHunt,
      SummonAgent,
-     CrossbowCharge
+     CrossbowCharge,
 }
 
 impl TryFrom<u8> for ActorEventType {
@@ -84,43 +84,65 @@ impl TryFrom<u8> for ActorEventType {
                x if x == ActorEventType::CureVillager as u8 => Ok(ActorEventType::CureVillager),
                x if x == ActorEventType::Respawn as u8 => Ok(ActorEventType::Respawn),
                x if x == ActorEventType::IronGolemOffer as u8 => Ok(ActorEventType::IronGolemOffer),
-               x if x == ActorEventType::IronGolemOfferStop as u8 => Ok(ActorEventType::IronGolemOfferStop),
+               x if x == ActorEventType::IronGolemOfferStop as u8 => {
+                    Ok(ActorEventType::IronGolemOfferStop)
+               }
                x if x == ActorEventType::Mate as u8 => Ok(ActorEventType::Mate),
                x if x == ActorEventType::HappyVillager as u8 => Ok(ActorEventType::HappyVillager),
                x if x == ActorEventType::AngryVillager as u8 => Ok(ActorEventType::AngryVillager),
                x if x == ActorEventType::WitchSpell as u8 => Ok(ActorEventType::WitchSpell),
                x if x == ActorEventType::Firework as u8 => Ok(ActorEventType::Firework),
                x if x == ActorEventType::FoundPartner as u8 => Ok(ActorEventType::FoundPartner),
-               x if x == ActorEventType::SilverfishSpawn as u8 => Ok(ActorEventType::SilverfishSpawn),
+               x if x == ActorEventType::SilverfishSpawn as u8 => {
+                    Ok(ActorEventType::SilverfishSpawn)
+               }
                x if x == ActorEventType::GuardianAttack as u8 => Ok(ActorEventType::GuardianAttack),
                x if x == ActorEventType::WitchDrink as u8 => Ok(ActorEventType::WitchDrink),
                x if x == ActorEventType::WitchThrow as u8 => Ok(ActorEventType::WitchThrow),
-               x if x == ActorEventType::MinecartTntPrime as u8 => Ok(ActorEventType::MinecartTntPrime),
+               x if x == ActorEventType::MinecartTntPrime as u8 => {
+                    Ok(ActorEventType::MinecartTntPrime)
+               }
                x if x == ActorEventType::CreeperPrime as u8 => Ok(ActorEventType::CreeperPrime),
-               x if x == ActorEventType::AirSupplyExpired as u8 => Ok(ActorEventType::AirSupplyExpired),
-               x if x == ActorEventType::PlayerAddXpLevel as u8 => Ok(ActorEventType::PlayerAddXpLevel),
-               x if x == ActorEventType::ElderGuardianCurse as u8 => Ok(ActorEventType::ElderGuardianCurse),
+               x if x == ActorEventType::AirSupplyExpired as u8 => {
+                    Ok(ActorEventType::AirSupplyExpired)
+               }
+               x if x == ActorEventType::PlayerAddXpLevel as u8 => {
+                    Ok(ActorEventType::PlayerAddXpLevel)
+               }
+               x if x == ActorEventType::ElderGuardianCurse as u8 => {
+                    Ok(ActorEventType::ElderGuardianCurse)
+               }
                x if x == ActorEventType::AgentArmSwing as u8 => Ok(ActorEventType::AgentArmSwing),
-               x if x == ActorEventType::EnderDragonDeath as u8 => Ok(ActorEventType::EnderDragonDeath),
+               x if x == ActorEventType::EnderDragonDeath as u8 => {
+                    Ok(ActorEventType::EnderDragonDeath)
+               }
                x if x == ActorEventType::DustParticle as u8 => Ok(ActorEventType::DustParticle),
                x if x == ActorEventType::ArrowShake as u8 => Ok(ActorEventType::ArrowShake),
                x if x == ActorEventType::EatItem as u8 => Ok(ActorEventType::EatItem),
                x if x == ActorEventType::FeedBabyAnimal as u8 => Ok(ActorEventType::FeedBabyAnimal),
-               x if x == ActorEventType::DeathSmokeCloud as u8 => Ok(ActorEventType::DeathSmokeCloud),
+               x if x == ActorEventType::DeathSmokeCloud as u8 => {
+                    Ok(ActorEventType::DeathSmokeCloud)
+               }
                x if x == ActorEventType::CompleteTrade as u8 => Ok(ActorEventType::CompleteTrade),
                x if x == ActorEventType::RemoveLeash as u8 => Ok(ActorEventType::RemoveLeash),
-               x if x == ActorEventType::LlamaCaravanUpdated as u8 => Ok(ActorEventType::LlamaCaravanUpdated),
+               x if x == ActorEventType::LlamaCaravanUpdated as u8 => {
+                    Ok(ActorEventType::LlamaCaravanUpdated)
+               }
                x if x == ActorEventType::ConsumeTotem as u8 => Ok(ActorEventType::ConsumeTotem),
-               x if x == ActorEventType::PlayerCheckTreasureHunterAchievement as u8 => Ok(ActorEventType::PlayerCheckTreasureHunterAchievement),
+               x if x == ActorEventType::PlayerCheckTreasureHunterAchievement as u8 => {
+                    Ok(ActorEventType::PlayerCheckTreasureHunterAchievement)
+               }
                x if x == ActorEventType::EntitySpawn as u8 => Ok(ActorEventType::EntitySpawn),
                x if x == ActorEventType::DragonBreath as u8 => Ok(ActorEventType::DragonBreath),
-               x if x == ActorEventType::ItemEntityMerge as u8 => Ok(ActorEventType::ItemEntityMerge),
+               x if x == ActorEventType::ItemEntityMerge as u8 => {
+                    Ok(ActorEventType::ItemEntityMerge)
+               }
                x if x == ActorEventType::StartSwimming as u8 => Ok(ActorEventType::StartSwimming),
                x if x == ActorEventType::BalloonPop as u8 => Ok(ActorEventType::BalloonPop),
                x if x == ActorEventType::TreasureHunt as u8 => Ok(ActorEventType::TreasureHunt),
                x if x == ActorEventType::SummonAgent as u8 => Ok(ActorEventType::SummonAgent),
                x if x == ActorEventType::CrossbowCharge as u8 => Ok(ActorEventType::CrossbowCharge),
-               _ => Err(())
+               _ => Err(()),
           }
      }
 }
@@ -134,9 +156,9 @@ impl ProtocolEncoder for ActorEventType {
 }
 
 pub struct ActorEvent {
-     entity_id: u64,
-     event_type: ActorEventType,
-     data: i32
+     pub entity_id: u64,
+     pub event_type: ActorEventType,
+     pub data: i32,
 }
 
 impl ProtocolEncoder for ActorEvent {
@@ -155,7 +177,7 @@ impl ProtocolDecoder for ActorEvent {
           Self {
                entity_id: stream.read_uvar_long(),
                event_type: stream.read_byte().try_into().unwrap(),
-               data: stream.read_var_int()
+               data: stream.read_var_int(),
           }
      }
 }

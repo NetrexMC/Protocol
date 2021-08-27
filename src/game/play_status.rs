@@ -1,5 +1,5 @@
-use binary_utils::{BinaryStream, IBufferWrite};
 use crate::util::ProtocolEncoder;
+use binary_utils::{BinaryStream, IBufferWrite};
 
 #[derive(Clone, Copy)]
 pub enum PlayStatus {
@@ -10,7 +10,7 @@ pub enum PlayStatus {
      InvalidTenant,
      EditionIsNotEducation,
      EditionIsNotMatching,
-     ServerFull
+     ServerFull,
 }
 
 impl ProtocolEncoder for PlayStatus {

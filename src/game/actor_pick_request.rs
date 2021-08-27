@@ -1,9 +1,9 @@
-use crate::util::{ProtocolEncoder, ProtocolDecoder};
+use crate::util::{ProtocolDecoder, ProtocolEncoder};
 use binary_utils::{BinaryStream, IBufferRead, IBufferWrite};
 
 pub struct ActorPickRequest {
      pub entity_id: u64,
-     pub slot: u8
+     pub slot: u8,
 }
 
 impl ProtocolEncoder for ActorPickRequest {
@@ -19,7 +19,7 @@ impl ProtocolDecoder for ActorPickRequest {
      fn read(stream: &mut BinaryStream) -> Self {
           Self {
                entity_id: stream.read_ulong(),
-               slot: stream.read_byte()
+               slot: stream.read_byte(),
           }
      }
 }
