@@ -13,4 +13,9 @@ pub enum PacketIds {
      LoginPacket,
 }
 
+#[derive(Encoder)]
+pub struct TestPacket {
+     pub field_b: u32
+}
+
 pub use self::{actor_event::*, actor_pick_request::*, login::Login};

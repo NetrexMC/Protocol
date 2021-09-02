@@ -3,6 +3,8 @@ pub mod game;
 pub mod interfaces;
 pub mod util;
 
+pub use protocol_derive;
+
 #[cfg(test)]
 mod tests {
      use crate::util::ProtocolDecoder;
@@ -11,7 +13,7 @@ mod tests {
 
      #[test]
      fn test_thing() {
-          let mut stream = BinaryStream::new();
-          let login = game::Login::read(&mut stream);
+          let thing = game::TestPacket { field_b: 2 };
+          thing.into_stream();
      }
 }

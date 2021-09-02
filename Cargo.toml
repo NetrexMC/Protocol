@@ -11,3 +11,4 @@ edition = "2018"
 binary_utils = { git = "https://github.com/NetrexMC/BinaryUtil", branch = "master" }
 glm = "0.2.3"
 serde_json = "1.0.66"
+protocol_derive = { path = "derive" }

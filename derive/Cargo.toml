@@ -1,0 +1,17 @@
+[package]
+name = "protocol_derive"
+version = "0.1.0"
+authors = ["Bavfalcon9 <olybear9@gmail.com>"]
+edition = "2018"
+private = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.29"
+quote = "1.0.9"
+syn = { version = "1.0.75", features = ["full"] }
+binary_utils = { git = "https://github.com/NetrexMC/BinaryUtil", branch = "master" }
