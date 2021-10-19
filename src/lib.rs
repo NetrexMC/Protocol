@@ -5,13 +5,12 @@ pub mod util;
 
 #[cfg(test)]
 mod tests {
-     use crate::util::ProtocolDecoder;
      use crate::*;
      use binary_utils::*;
 
      #[test]
      fn test_thing() {
-          let mut stream = BinaryStream::new();
-          let login = game::Login::read(&mut stream);
+          let mut stream = Vec::new();
+          let login = game::Login::compose(&mut stream);
      }
 }

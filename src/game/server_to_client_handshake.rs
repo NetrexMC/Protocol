@@ -1,5 +1,5 @@
 use crate::util::ProtocolEncoder;
-use binary_utils::BinaryStream;
+use binary_utils::*;
 
 pub struct ServerClientHandshake {
      pub jwt_data: Vec<u8>,
