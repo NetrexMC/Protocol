@@ -98,7 +98,7 @@ impl Streamable for VarSlice {
           let length = VarInt::<u32>::from_be_bytes(source);
 
           // actual string is stored here.
-          let contents = &source[*position..(length.0 as usize) + *position];
+          let contents = &source[*position..((length.get_byte_length() as usize - 1)) + *position];
           *position += length.get_byte_length() as usize;
 
           Self(contents.to_vec())
