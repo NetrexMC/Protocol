@@ -78,6 +78,37 @@ impl Streamable for VarString {
          let mut stream = Vec::new();
          let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
          stream.write_all(&bytes[..]).unwrap();
+         stream.write_all(self.0.as_bytes()).unwrap();
+         stream
+     }
+}
+
+
+pub struct VarSlice(pub Vec<u8>);
+
+impl VarSlice {
+     pub fn to_vec(self) -> Vec<u8> {
+          self.0
+     }
+}
+
+impl Streamable for VarSlice {
+     fn compose(source: &[u8], position: &mut usize) -> Self {
+          // read the length in var ints
+          let length = VarInt::<u32>::from_be_bytes(source);
+
+          // actual string is stored here.
+          let contents = &source[*position..(length.get_byte_length() as usize) + *position];
+          *position += length.get_byte_length() as usize;
+
+          Self(contents.to_vec())
+     }
+
+     fn parse(&self) -> Vec<u8> {
+         let mut stream = Vec::new();
+         let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
+         stream.write_all(&bytes[..]).unwrap();
+         stream.write_all(&self.0[..]).unwrap();
          stream
      }
 }
