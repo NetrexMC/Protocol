@@ -99,6 +99,7 @@ impl Streamable for VarSlice {
           *position += length.get_byte_length() as usize;
           let from = *position;
           let to = length.0 as usize + *position;
+          *position += length.0 as usize;
           // actual string is stored here.
           let contents = &source[from..to];
 
