@@ -96,10 +96,10 @@ impl Streamable for VarSlice {
      fn compose(source: &[u8], position: &mut usize) -> Self {
           // read the length in var ints
           let length = VarInt::<u32>::from_be_bytes(source);
+          *position += length.get_byte_length() as usize;
 
           // actual string is stored here.
-          let contents = &source[*position..((length.get_byte_length() as usize - 1)) + *position];
-          *position += length.get_byte_length() as usize;
+          let contents = &source[*position..(length.0 as usize)];
 
           Self(contents.to_vec())
      }
