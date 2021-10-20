@@ -1,8 +1,7 @@
 // use crate::util::ProtocolEncoder;
 // use binary_utils::{BinaryStream, IBinaryStream, IBufferWrite};
 use binary_utils::*;
-use std::io::{Write, Read};
-use byteorder::{ReadBytesExt, WriteBytesExt};
+use std::{convert::TryInto, io::Write};
 // /// A 12 byte value prefixed with 3 floats, x y and z.
 // #[derive(Copy, Clone)]
 // pub struct Vector3 {
@@ -39,11 +38,12 @@ pub struct Location {
 
 /// A helper struct that allows easily reading of
 /// bytes from a buffer, while keeping it's size
+#[derive(Debug)]
 pub struct Slice(pub Vec<u8>);
 
 impl Streamable for Slice {
      fn parse(&self) -> Vec<u8> {
-         self.0
+         self.0.clone()
      }
 
      fn compose(source: &[u8], position: &mut usize) -> Self {
@@ -68,16 +68,16 @@ impl Streamable for VarString {
           let length = VarInt::<u32>::from_be_bytes(source);
 
           // actual string is stored here.
-          let contents = source[*position..length.get_byte_length() + *position];
-          *position += length.get_byte_length();
+          let contents = &source[*position..(length.get_byte_length() as usize) + *position];
+          *position += length.get_byte_length() as usize;
 
           Self(String::from_utf8(contents.to_vec()).unwrap())
      }
 
      fn parse(&self) -> Vec<u8> {
          let mut stream = Vec::new();
-         let bytes = VarInt::<u32>(self.0.len()).to_be_bytes();
-         stream.write_all(bytes).unwrap();
+         let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
+         stream.write_all(&bytes[..]).unwrap();
          stream
      }
 }

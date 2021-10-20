@@ -20,7 +20,7 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 [[package]]
 name = "bin_macro"
 version = "0.1.0"
-source = "git+https://github.com/NetrexMC/BinaryUtil?branch=v2#6fbfb2d1ca98edca3d75b14f64c94f0636b9f0a6"
+source = "git+https://github.com/NetrexMC/BinaryUtil?branch=v2#188aded1454bb49bc527c41a9651ac0a81163cb3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -30,7 +30,7 @@ dependencies = [
 [[package]]
 name = "binary_utils"
 version = "0.2.0"
-source = "git+https://github.com/NetrexMC/BinaryUtil?branch=v2#6fbfb2d1ca98edca3d75b14f64c94f0636b9f0a6"
+source = "git+https://github.com/NetrexMC/BinaryUtil?branch=v2#188aded1454bb49bc527c41a9651ac0a81163cb3"
 dependencies = [
  "bin_macro",
  "byteorder",
