@@ -83,7 +83,6 @@ impl Streamable for VarString {
      }
 }
 
-
 pub struct VarSlice(pub Vec<u8>);
 
 impl VarSlice {
@@ -104,6 +103,48 @@ impl Streamable for VarSlice {
           let contents = &source[from..to];
 
           Self(contents.to_vec())
+     }
+
+     fn parse(&self) -> Vec<u8> {
+         let mut stream = Vec::new();
+         let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
+         stream.write_all(&bytes[..]).unwrap();
+         stream.write_all(&self.0[..]).unwrap();
+         stream
+     }
+}
+
+/// Byte arrays are read with varints.
+/// The length of the bytearray sized by a varint.
+pub struct ByteArray<T>(pub Vec<T>);
+
+impl<T> ByteArray<T>
+where
+     T: Streamable {
+     pub fn to_vec(self) -> Vec<T> {
+          self.0
+     }
+}
+
+impl<T> Streamable for ByteArray<T>
+where
+     T: Streamable {
+     fn compose(source: &[u8], position: &mut usize) -> Self {
+          // read the length in var ints
+          let length = VarInt::<u32>::from_be_bytes(source);
+          *position += length.get_byte_length() as usize;
+          let from = *position;
+          let to = length.0 as usize + *position;
+          *position += length.0 as usize;
+
+          let mut ret = Vec::<T>::new();
+
+          loop {
+               // check if we've exceeded the length of the buffer
+               if 
+               let contents = &source[from..to];
+
+          Self()
      }
 
      fn parse(&self) -> Vec<u8> {
