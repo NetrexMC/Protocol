@@ -126,32 +126,33 @@ where
      }
 }
 
-impl<T> Streamable for ByteArray<T>
-where
-     T: Streamable {
-     fn compose(source: &[u8], position: &mut usize) -> Self {
-          // read the length in var ints
-          let length = VarInt::<u32>::from_be_bytes(source);
-          *position += length.get_byte_length() as usize;
-          let from = *position;
-          let to = length.0 as usize + *position;
-          *position += length.0 as usize;
+// impl<T> Streamable for ByteArray<T>
+// where
+//      T: Streamable {
+//      fn compose(source: &[u8], position: &mut usize) -> Self {
+//           // read the length in var ints
+//           let length = VarInt::<u32>::from_be_bytes(source);
+//           *position += length.get_byte_length() as usize;
+//           let from = *position;
+//           let to = length.0 as usize + *position;
+//           *position += length.0 as usize;
 
-          let mut ret = Vec::<T>::new();
+//           let mut ret = Vec::<T>::new();
 
-          loop {
-               // check if we've exceeded the length of the buffer
-               if 
-               let contents = &source[from..to];
+//           // loop {
+//           //      // check if we've exceeded the length of the buffer
+//           //      if 
+//           //      let contents = &source[from..to];
+//           // }
 
-          Self()
-     }
+//           Self(ret)
+//      }
 
-     fn parse(&self) -> Vec<u8> {
-         let mut stream = Vec::new();
-         let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
-         stream.write_all(&bytes[..]).unwrap();
-         stream.write_all(&self.0[..]).unwrap();
-         stream
-     }
-}
+//      fn parse(&self) -> Vec<u8> {
+//          let mut stream = Vec::new();
+//          let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
+//          stream.write_all(&bytes[..]).unwrap();
+//          stream.write_all(&self.0[..]).unwrap();
+//          stream
+//      }
+// }
