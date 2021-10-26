@@ -132,26 +132,30 @@ where
      fn compose(source: &[u8], position: &mut usize) -> Self {
           // read the length in var ints
           let length = VarInt::<u32>::from_be_bytes(source);
+          // Update the position to consume the length of the varint.
           *position += length.get_byte_length() as usize;
-          let from = *position;
-          let to = length.0 as usize + *position;
           *position += length.0 as usize;
 
           let mut ret = Vec::<T>::new();
 
-          loop {
-               // check if we've exceeded the length of the buffer
-               if 
-               let contents = &source[from..to];
+          // we have the length now let's iterate until we dont.
+          for _ in 0..length.0 {
+               let data = T::compose(source, position);
+               ret.push(data);
+          }
 
-          Self()
+          Self(ret)
      }
 
      fn parse(&self) -> Vec<u8> {
          let mut stream = Vec::new();
-         let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
-         stream.write_all(&bytes[..]).unwrap();
-         stream.write_all(&self.0[..]).unwrap();
+         let length = VarInt::<u32>(self.0.len() as u32);
+         // write the length.
+         stream.write_all(&length.to_be_bytes()[..]).unwrap();
+         for kind in &self.0 {
+              // write each index now.
+              stream.write_all(&kind.parse()[..]).expect("Writing a ByteArray failed.");
+         }
          stream
      }
 }
