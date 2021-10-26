@@ -9,7 +9,7 @@ use crate::interfaces::{VarString, Slice};
 /// Login Packet
 #[derive(Debug, BinaryStream)]
 pub struct Login {
-     pub protocol: u8,
+     pub protocol: u32,
      pub request_data: Slice
 }
 
