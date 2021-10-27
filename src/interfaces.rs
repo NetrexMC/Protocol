@@ -49,6 +49,7 @@ impl Streamable for Slice {
 /// let encoded = VarString(my_string).parse();
 /// [12, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33]
 /// ```
+#[derive(Debug, Clone)]
 pub struct VarString(pub String);
 
 impl VarString {
@@ -60,11 +61,11 @@ impl VarString {
 impl Streamable for VarString {
      fn compose(source: &[u8], position: &mut usize) -> Self {
           // read the length in var ints
-          let length = VarInt::<u32>::from_be_bytes(source);
-
-          // actual string is stored here.
-          let contents = &source[*position..(length.get_byte_length() as usize) + *position];
+          let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
+          // increase the offset byte the length of bytes the varint is.
           *position += length.get_byte_length() as usize;
+          let contents = &source[*position..(*position + length.0 as usize)];
+          *position += contents.len();
 
           Self(String::from_utf8(contents.to_vec()).unwrap())
      }
@@ -80,10 +81,31 @@ impl Streamable for VarString {
 
 /// A helper struct to encode u32/i32 Length strings
 /// It is advised to use String implementation when possible.
+#[derive(Debug)]
 pub struct String32(pub String);
+
+impl Streamable for String32 {
+     fn parse(&self) -> Vec<u8> {
+         // get the length
+         let mut buffer: Vec<u8> = Vec::new();
+         buffer.write_all(&(self.0.len() as u32).parse()[..]).unwrap();
+         // now we write string buffer.
+         buffer.write_all(&self.0.clone().into_bytes()[..]).unwrap();
+         buffer
+     }
+
+     fn compose(source: &[u8], position: &mut usize) -> Self {
+         // get the length.
+         let length = u32::compose(&source, position);
+         let bytes = &source[*position..(*position + length as usize)];
+         *position = bytes.len();
+         Self(String::from_utf8(bytes.to_vec()).unwrap())
+     }
+}
 
 /// A helper struct to encode u32/i32 LE Length strings
 /// It is advised to use String implementation when possible.
+#[derive(Debug)]
 pub struct LString32(pub String);
 
 impl Streamable for LString32 {
@@ -99,29 +121,13 @@ impl Streamable for LString32 {
      fn compose(source: &[u8], position: &mut usize) -> Self {
          // get the length.
          let length = LE::<u32>::compose(&source, position);
-         let bytes = &source[*position..(length.0 as usize)];
+         let bytes = &source[*position..(*position + length.0 as usize)];
+         *position = bytes.len();
          Self(String::from_utf8(bytes.to_vec()).unwrap())
      }
 }
 
-impl Streamable for String32 {
-     fn parse(&self) -> Vec<u8> {
-         // get the length
-         let mut buffer: Vec<u8> = Vec::new();
-         buffer.write_all(&(self.0.len() as u32).parse()[..]).unwrap();
-         // now we write string buffer.
-         buffer.write_all(&self.0.clone().into_bytes()[..]).unwrap();
-         buffer
-     }
-
-     fn compose(source: &[u8], position: &mut usize) -> Self {
-         // get the length.
-         let length = u32::compose(&source, position);
-         let bytes = &source[*position..(length as usize)];
-         Self(String::from_utf8(bytes.to_vec()).unwrap())
-     }
-}
-
+#[derive(Debug)]
 pub struct VarSlice(pub Vec<u8>);
 
 impl VarSlice {
@@ -133,7 +139,7 @@ impl VarSlice {
 impl Streamable for VarSlice {
      fn compose(source: &[u8], position: &mut usize) -> Self {
           // read the length in var ints
-          let length = VarInt::<u32>::from_be_bytes(source);
+          let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
           *position += length.get_byte_length() as usize;
           let from = *position;
           let to = length.0 as usize + *position;
@@ -155,6 +161,7 @@ impl Streamable for VarSlice {
 
 /// Byte arrays are read with varints.
 /// The length of the bytearray sized by a varint.
+#[derive(Debug, Clone)]
 pub struct ByteArray<T>(pub Vec<T>);
 
 impl<T> ByteArray<T>
@@ -170,16 +177,15 @@ where
      T: Streamable {
      fn compose(source: &[u8], position: &mut usize) -> Self {
           // read the length in var ints
-          let length = VarInt::<u32>::from_be_bytes(source);
+          let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
           // Update the position to consume the length of the varint.
           *position += length.get_byte_length() as usize;
-          *position += length.0 as usize;
 
           let mut ret = Vec::<T>::new();
 
           // we have the length now let's iterate until we dont.
           for _ in 0..length.0 {
-               let data = T::compose(source, position);
+               let data = T::compose(&source, position);
                ret.push(data);
           }
 
