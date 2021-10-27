@@ -2,20 +2,6 @@
 // use binary_utils::{BinaryStream, IBinaryStream, IBufferWrite};
 use binary_utils::*;
 use std::{convert::TryInto, io::Write};
-// /// A 12 byte value prefixed with 3 floats, x y and z.
-// #[derive(Copy, Clone)]
-// pub struct Vector3 {
-//      pub x: f32,
-//      pub y: f32,
-//      pub z: f32
-// }
-
-// /// A 8 byte value prefixed with 2 floats, x, z.
-// #[derive(Copy, Clone)]
-// pub struct Vector2 {
-//      pub x: f32,
-//      pub z: f32
-// }
 
 /// A 3 - 15 byte struct
 #[derive(Copy, Clone, BinaryStream)]
@@ -54,6 +40,15 @@ impl Streamable for Slice {
      }
 }
 
+/// A helper struct to read/write Strings with
+/// varint encoded lengths.
+///
+/// **Example:**
+/// ```rust notest
+/// let my_string = "Hello World!".to_string();
+/// let encoded = VarString(my_string).parse();
+/// [12, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33]
+/// ```
 pub struct VarString(pub String);
 
 impl VarString {
@@ -80,6 +75,50 @@ impl Streamable for VarString {
          stream.write_all(&bytes[..]).unwrap();
          stream.write_all(self.0.as_bytes()).unwrap();
          stream
+     }
+}
+
+/// A helper struct to encode u32/i32 Length strings
+/// It is advised to use String implementation when possible.
+pub struct String32(pub String);
+
+/// A helper struct to encode u32/i32 LE Length strings
+/// It is advised to use String implementation when possible.
+pub struct LString32(pub String);
+
+impl Streamable for LString32 {
+     fn parse(&self) -> Vec<u8> {
+         // get the length
+         let mut buffer: Vec<u8> = Vec::new();
+         buffer.write_all(&LE::<u32>(self.0.len() as u32).parse()[..]).unwrap();
+         // now we write string buffer.
+         buffer.write_all(&self.0.clone().into_bytes()[..]).unwrap();
+         buffer
+     }
+
+     fn compose(source: &[u8], position: &mut usize) -> Self {
+         // get the length.
+         let length = LE::<u32>::compose(&source, position);
+         let bytes = &source[*position..(length.0 as usize)];
+         Self(String::from_utf8(bytes.to_vec()).unwrap())
+     }
+}
+
+impl Streamable for String32 {
+     fn parse(&self) -> Vec<u8> {
+         // get the length
+         let mut buffer: Vec<u8> = Vec::new();
+         buffer.write_all(&(self.0.len() as u32).parse()[..]).unwrap();
+         // now we write string buffer.
+         buffer.write_all(&self.0.clone().into_bytes()[..]).unwrap();
+         buffer
+     }
+
+     fn compose(source: &[u8], position: &mut usize) -> Self {
+         // get the length.
+         let length = u32::compose(&source, position);
+         let bytes = &source[*position..(length as usize)];
+         Self(String::from_utf8(bytes.to_vec()).unwrap())
      }
 }
 
