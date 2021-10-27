@@ -24,7 +24,7 @@ pub struct Location {
 
 /// A helper struct that allows easily reading of
 /// bytes from a buffer, while keeping it's size
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Slice(pub Vec<u8>);
 
 impl Streamable for Slice {
@@ -81,7 +81,7 @@ impl Streamable for VarString {
 
 /// A helper struct to encode u32/i32 Length strings
 /// It is advised to use String implementation when possible.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct String32(pub String);
 
 impl Streamable for String32 {
@@ -105,7 +105,7 @@ impl Streamable for String32 {
 
 /// A helper struct to encode u32/i32 LE Length strings
 /// It is advised to use String implementation when possible.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LString32(pub String);
 
 impl Streamable for LString32 {
@@ -127,7 +127,7 @@ impl Streamable for LString32 {
      }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VarSlice(pub Vec<u8>);
 
 impl VarSlice {
