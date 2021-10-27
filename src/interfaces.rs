@@ -44,7 +44,7 @@ impl Streamable for Slice {
 /// varint encoded lengths.
 ///
 /// **Example:**
-/// ```rust notest
+/// ```rust ignore
 /// let my_string = "Hello World!".to_string();
 /// let encoded = VarString(my_string).parse();
 /// [12, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33]
