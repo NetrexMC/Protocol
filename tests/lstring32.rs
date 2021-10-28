@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use binary_utils::*;
 use mcpe_protocol::interfaces::LString32;
 
@@ -21,4 +23,20 @@ fn read_l32string() {
      let hello_world = "Hello World!".to_string();
      let data = LString32::compose(HW_TEST_DATA, &mut 0);
      assert_eq!(data.0, hello_world);
+}
+
+#[test]
+fn read_twice() {
+     let hello_world = "Hello World!".to_string();
+     let mut stream = Vec::<u8>::new();
+     stream.write_all(&LString32(hello_world.clone()).parse()[..]).unwrap();
+     stream.write_all(&LString32(hello_world).parse()[..]).unwrap();
+     // ok read it.
+     let mut pos: usize = 0;
+     let one = LString32::compose(&stream[..], &mut pos).0;
+     dbg!(&one);
+     dbg!(&pos);
+     let two = LString32::compose(&stream[..], &mut pos).0;
+
+     assert_eq!(one, two);
 }

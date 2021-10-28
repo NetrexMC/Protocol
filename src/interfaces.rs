@@ -119,11 +119,12 @@ impl Streamable for LString32 {
      }
 
      fn compose(source: &[u8], position: &mut usize) -> Self {
-         // get the length.
-         let length = LE::<u32>::compose(&source, position);
+         let length = LE::<u32>::compose(source, position);
          let bytes = &source[*position..(*position + length.0 as usize)];
-         *position = bytes.len();
-         Self(String::from_utf8(bytes.to_vec()).unwrap())
+
+         *position += bytes.len();
+
+         Self(unsafe { String::from_utf8_unchecked(bytes.to_vec()) })
      }
 }
 
