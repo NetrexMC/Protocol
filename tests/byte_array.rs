@@ -57,12 +57,12 @@ fn write_byte_array() {
     ];
 
     let data = ByteArray::<Foo>(foos);
-    assert_eq!(&data.parse()[..], FOO_TEST_DATA);
+    assert_eq!(&data.fparse()[..], FOO_TEST_DATA);
 }
 
 #[test]
 fn read_byte_array() {
-    let data = ByteArray::<Foo>::compose(FOO_TEST_DATA, &mut 0);
+    let data = ByteArray::<Foo>::fcompose(FOO_TEST_DATA, &mut 0);
     let foos = vec![
         Foo {
             string: VarString("Foo one".to_string()),

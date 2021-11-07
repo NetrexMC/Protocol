@@ -13,7 +13,7 @@ pub const HW_TEST_DATA: &[u8] = &[
 #[test]
 fn write_l32string() {
      let hello_world = "Hello World!".to_string();
-     let data = LString32(hello_world).parse();
+     let data = LString32(hello_world).fparse();
 
      assert_eq!(HW_TEST_DATA, &data[..]);
 }
@@ -21,7 +21,7 @@ fn write_l32string() {
 #[test]
 fn read_l32string() {
      let hello_world = "Hello World!".to_string();
-     let data = LString32::compose(HW_TEST_DATA, &mut 0);
+     let data = LString32::fcompose(HW_TEST_DATA, &mut 0);
      assert_eq!(data.0, hello_world);
 }
 
@@ -29,14 +29,14 @@ fn read_l32string() {
 fn read_twice() {
      let hello_world = "Hello World!".to_string();
      let mut stream = Vec::<u8>::new();
-     stream.write_all(&LString32(hello_world.clone()).parse()[..]).unwrap();
-     stream.write_all(&LString32(hello_world).parse()[..]).unwrap();
+     stream.write_all(&LString32(hello_world.clone()).fparse()[..]).unwrap();
+     stream.write_all(&LString32(hello_world).fparse()[..]).unwrap();
      // ok read it.
      let mut pos: usize = 0;
-     let one = LString32::compose(&stream[..], &mut pos).0;
+     let one = LString32::fcompose(&stream[..], &mut pos).0;
      dbg!(&one);
      dbg!(&pos);
-     let two = LString32::compose(&stream[..], &mut pos).0;
+     let two = LString32::fcompose(&stream[..], &mut pos).0;
 
      assert_eq!(one, two);
 }

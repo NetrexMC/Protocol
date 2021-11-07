@@ -13,12 +13,13 @@ pub enum GamePacket {
 
 pub fn construct_packet(id: u8, buffer: &[u8]) -> GamePacket {
      match id {
-          0x01 => GamePacket::Login(Login::compose(buffer, &mut 0)),
-          0x02 => GamePacket::PlayStatus(PlayStatus::compose(buffer, &mut 0)),
-          0x03 => GamePacket::ServerToClientHandshake(ServerToClientHandshake::compose(buffer, &mut 0)),
-          0x04 => GamePacket::ClientToServerHandshake(ClientToServerHandshake::compose(buffer, &mut 0)),
-          0x05 => GamePacket::Disconnect(Disconnect::compose(buffer, &mut 0)),
-          0x06 => GamePacket::ResourcePackInfo(ResourcePackInfo::compose(buffer, &mut 0)),
+          0x01 => GamePacket::Login(Login::fcompose(buffer, &mut 0)),
+          0x02 => GamePacket::PlayStatus(PlayStatus::fcompose(buffer, &mut 0)),
+          0x03 => GamePacket::ServerToClientHandshake(ServerToClientHandshake::fcompose(buffer, &mut 0)),
+          0x04 => GamePacket::ClientToServerHandshake(ClientToServerHandshake::fcompose(buffer, &mut 0)),
+          0x05 => GamePacket::Disconnect(Disconnect::fcompose(buffer, &mut 0)),
+          0x06 => GamePacket::ResourcePackInfo(ResourcePackInfo::fcompose(buffer, &mut 0)),
           _ => GamePacket::Unknown(buffer.to_vec())
      }
 }
+

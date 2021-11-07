@@ -1,6 +1,7 @@
 // use crate::util::ProtocolEncoder;
 // use binary_utils::{BinaryStream, IBinaryStream, IBufferWrite};
 use binary_utils::*;
+use binary_utils::error::BinaryError;
 use std::{convert::TryInto, io::Write};
 
 /// A 3 - 15 byte struct
@@ -28,15 +29,15 @@ pub struct Location {
 pub struct Slice(pub Vec<u8>);
 
 impl Streamable for Slice {
-     fn parse(&self) -> Vec<u8> {
-         self.0.clone()
+     fn parse(&self) -> Result<Vec<u8>, BinaryError> {
+         Ok(self.0.clone())
      }
 
-     fn compose(source: &[u8], position: &mut usize) -> Self {
+     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
           // reads until EOF
           let pos = position.clone();
           *position = source.len();
-          Self(source[pos..].to_vec())
+          Ok(Self(source[pos..].to_vec()))
      }
 }
 
@@ -59,7 +60,7 @@ impl VarString {
 }
 
 impl Streamable for VarString {
-     fn compose(source: &[u8], position: &mut usize) -> Self {
+     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
           // read the length in var ints
           let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
           // increase the offset byte the length of bytes the varint is.
@@ -67,15 +68,15 @@ impl Streamable for VarString {
           let contents = &source[*position..(*position + length.0 as usize)];
           *position += contents.len();
 
-          Self(String::from_utf8(contents.to_vec()).unwrap())
+          Ok(Self(String::from_utf8(contents.to_vec()).unwrap()))
      }
 
-     fn parse(&self) -> Vec<u8> {
+     fn parse(&self) -> Result<Vec<u8>, BinaryError> {
          let mut stream = Vec::new();
          let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
-         stream.write_all(&bytes[..]).unwrap();
-         stream.write_all(self.0.as_bytes()).unwrap();
-         stream
+         stream.write_all(&bytes[..])?;
+         stream.write_all(self.0.as_bytes())?;
+         Ok(stream)
      }
 }
 
@@ -85,21 +86,21 @@ impl Streamable for VarString {
 pub struct String32(pub String);
 
 impl Streamable for String32 {
-     fn parse(&self) -> Vec<u8> {
+     fn parse(&self) -> Result<Vec<u8>, BinaryError> {
          // get the length
          let mut buffer: Vec<u8> = Vec::new();
-         buffer.write_all(&(self.0.len() as u32).parse()[..]).unwrap();
+         buffer.write_all(&(self.0.len() as u32).parse()?[..])?;
          // now we write string buffer.
-         buffer.write_all(&self.0.clone().into_bytes()[..]).unwrap();
-         buffer
+         buffer.write_all(&self.0.clone().into_bytes()[..])?;
+         Ok(buffer)
      }
 
-     fn compose(source: &[u8], position: &mut usize) -> Self {
+     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
          // get the length.
-         let length = u32::compose(&source, position);
+         let length = u32::compose(&source, position)?;
          let bytes = &source[*position..(*position + length as usize)];
          *position = bytes.len();
-         Self(String::from_utf8(bytes.to_vec()).unwrap())
+         Ok(Self(String::from_utf8(bytes.to_vec()).unwrap()))
      }
 }
 
@@ -109,22 +110,22 @@ impl Streamable for String32 {
 pub struct LString32(pub String);
 
 impl Streamable for LString32 {
-     fn parse(&self) -> Vec<u8> {
+     fn parse(&self) -> Result<Vec<u8>, BinaryError> {
          // get the length
          let mut buffer: Vec<u8> = Vec::new();
-         buffer.write_all(&LE::<u32>(self.0.len() as u32).parse()[..]).unwrap();
+         buffer.write_all(&LE::<u32>(self.0.len() as u32).parse()?[..])?;
          // now we write string buffer.
-         buffer.write_all(&self.0.clone().into_bytes()[..]).unwrap();
-         buffer
+         buffer.write_all(&self.0.clone().into_bytes()[..])?;
+         Ok(buffer)
      }
 
-     fn compose(source: &[u8], position: &mut usize) -> Self {
-         let length = LE::<u32>::compose(source, position);
+     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
+         let length = LE::<u32>::compose(source, position)?;
          let bytes = &source[*position..(*position + length.0 as usize)];
 
          *position += bytes.len();
 
-         Self(unsafe { String::from_utf8_unchecked(bytes.to_vec()) })
+         Ok(Self(unsafe { String::from_utf8_unchecked(bytes.to_vec()) }))
      }
 }
 
@@ -138,7 +139,7 @@ impl VarSlice {
 }
 
 impl Streamable for VarSlice {
-     fn compose(source: &[u8], position: &mut usize) -> Self {
+     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
           // read the length in var ints
           let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
           *position += length.get_byte_length() as usize;
@@ -148,15 +149,15 @@ impl Streamable for VarSlice {
           // actual string is stored here.
           let contents = &source[from..to];
 
-          Self(contents.to_vec())
+          Ok(Self(contents.to_vec()))
      }
 
-     fn parse(&self) -> Vec<u8> {
+     fn parse(&self) -> Result<Vec<u8>, BinaryError> {
          let mut stream = Vec::new();
          let bytes = VarInt::<u32>(self.0.len().try_into().unwrap()).to_be_bytes();
-         stream.write_all(&bytes[..]).unwrap();
-         stream.write_all(&self.0[..]).unwrap();
-         stream
+         stream.write_all(&bytes[..])?;
+         stream.write_all(&self.0[..])?;
+         Ok(stream)
      }
 }
 
@@ -176,7 +177,7 @@ where
 impl<T> Streamable for ByteArray<T>
 where
      T: Streamable {
-     fn compose(source: &[u8], position: &mut usize) -> Self {
+     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
           // read the length in var ints
           let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
           // Update the position to consume the length of the varint.
@@ -186,22 +187,22 @@ where
 
           // we have the length now let's iterate until we dont.
           for _ in 0..length.0 {
-               let data = T::compose(&source, position);
+               let data = T::compose(&source, position)?;
                ret.push(data);
           }
 
-          Self(ret)
+          Ok(Self(ret))
      }
 
-     fn parse(&self) -> Vec<u8> {
+     fn parse(&self) -> Result<Vec<u8>, BinaryError> {
          let mut stream = Vec::new();
          let length = VarInt::<u32>(self.0.len() as u32);
          // write the length.
          stream.write_all(&length.to_be_bytes()[..]).unwrap();
          for kind in &self.0 {
               // write each index now.
-              stream.write_all(&kind.parse()[..]).expect("Writing a ByteArray failed.");
+              stream.write_all(&kind.parse()?[..]).expect("Writing a ByteArray failed.");
          }
-         stream
+         Ok(stream)
      }
 }

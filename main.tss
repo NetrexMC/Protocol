@@ -1,0 +1,9 @@
+use hook;
+
+let protocol = rust! {
+     // Error: Import succeeded but could not be converted to AST
+     use mcpe_protocol
+}
+
+// Error: Macro failed
+protocol.mcpe.packet;

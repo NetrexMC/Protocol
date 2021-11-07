@@ -2,22 +2,26 @@
 // the ability to compile mixed rust and t# code.
 #compiler no-lazy-types decorators-v2
 #compiler use-compile-events -with-types
+#compiler enable-macros-rc.1
 
 // This is only in std during betas.
-use std::extern::rustc;
-use std::extern::rustc_util as util;
+use typesharp.extern.rust;
+use {self, macro, Hooks, ast} from typesharp.compiler;
 
-#compiler @parse_error
-pub fn on_parse_error({ ast }: CompileError): Possibly<any> {
-     // implicit cast to rust AST
-     ast = ast.into<Rust.AST>();
-     // rust util in t#
-     var inter = rustc::interfaces::CompilerConfigDefault();
-     if var code = ast.assemble(util::assemblers("rust"), ast).to_string() {
-          // start compiling!
-          // we need to merge this ast
-          return rustc::interfaces::run_compiler(inter, code) || Possibly();
+compiler::main().addHook(Hooks::DURING_PARSE << HOOKS::UNKNOWN_BLOCK, (context: ast.Context, block: ast.Block) => ast.Block {
+     let tokens = block.body.toTokens();
+     if tokens.eatNextName("rust!") {
+          let rustEngine = rust::NIGHTLY();
+          let newAst = rustEngine.generate_ast_with_llvm(&tokens);
+
+          if context.isLocked() {
+               context.release();
+          }
+
+          block.syntax = ast.assembly.Syntax::ASM_SYSTEM_ARC;
+          block.contents = newAst;
+          return block;
+     } else {
+          return block;
      }
-
-     return Possibly<Typesharp::compiler::Op>(Op::Advance);
-}
+});
