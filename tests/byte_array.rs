@@ -3,32 +3,21 @@ use mcpe_protocol::interfaces::{ByteArray, VarString};
 
 pub const FOO_TEST_DATA: &[u8] = &[
     // Length (Array Length)
-    2,
-    // String length
-    7,
-    // String Data (string)
-    70, 111, 111, 32, 111, 110, 101,
-    // magic (512)
-    0, 0, 2, 0,
-    // bar (32)
-    32,
-    // String length
-    12,
-    // String Data (hello)
+    2, // String length
+    7, // String Data (string)
+    70, 111, 111, 32, 111, 110, 101, // magic (512)
+    0, 0, 2, 0,  // bar (32)
+    32, // String length
+    12, // String Data (hello)
     72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33,
     // Next struct...
     // String length
-    7,
-    // String Data (string)
-    70, 111, 111, 32, 116, 119, 111,
-    // magic (1024)
-    0, 0, 4, 0,
-    // bar (32)
-    240,
-    // String length
-    12,
-    // String Data (string)
-    72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33
+    7, // String Data (string)
+    70, 111, 111, 32, 116, 119, 111, // magic (1024)
+    0, 0, 4, 0,   // bar (32)
+    240, // String length
+    12,  // String Data (string)
+    72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33,
 ];
 
 #[derive(Debug, Clone, BinaryStream)]
