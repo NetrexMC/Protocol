@@ -7,21 +7,21 @@ pub use packet::*;
 // Final, a lot of it is just Wrapper typing.
 
 /// Login Packet
-#[derive(Debug, BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 pub struct Login {
     pub protocol: u32,
     pub request_data: Slice,
 }
 
-#[derive(Debug, BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 pub struct ServerToClientHandshake {
     pub jwt: Slice,
 }
 
-#[derive(Debug, BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 pub struct ClientToServerHandshake {}
 
-#[derive(Debug, BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 #[repr(u32)]
 pub enum PlayStatus {
     // Failed login
@@ -35,14 +35,14 @@ pub enum PlayStatus {
     ServerFull = 7,
 }
 
-#[derive(BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 pub struct Disconnect {
     pub hide_screen: bool,
     pub message: VarString,
 }
 
 // Resource packs {{
-#[derive(BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 pub struct BehaviorPackInfo {
     pub uuid: VarString,
     pub version: VarString,
@@ -53,7 +53,7 @@ pub struct BehaviorPackInfo {
     pub has_scripts: bool,
 }
 
-#[derive(BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 pub struct TexturePackInfo {
     pub uuid: VarString,
     pub version: VarString,
@@ -65,7 +65,7 @@ pub struct TexturePackInfo {
     pub rtx_enabled: bool,
 }
 
-#[derive(BinaryStream)]
+#[derive(Debug, Clone, BinaryStream)]
 pub struct ResourcePackInfo {
     pub pack_required: bool,
     pub has_scripts: bool,

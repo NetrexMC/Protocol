@@ -160,6 +160,20 @@ impl Streamable for VarSlice {
     }
 }
 
+/// A leading byte array,
+/// The length of the byte array is encoded as `L`
+// pub struct LByteArray<T, const L: usize>(pub Vec<T>);
+
+// impl<L, T> Streamable for LByteArray<L, T>
+// where
+//      L: AnyNumber,
+//      T: Streamable {
+//      fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
+//          let length = L::compose(source, position)?;
+//      }
+//      fn parse(&self) -> Result<Vec<u8>, BinaryError> { todo!() }
+// }
+
 /// Byte arrays are read with varints.
 /// The length of the bytearray sized by a varint.
 #[derive(Debug, Clone)]
