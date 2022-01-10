@@ -1,5 +1,8 @@
+use std::io::Write;
+
 use super::*;
 use binary_utils::*;
+use byteorder::WriteBytesExt;
 
 pub trait PacketId {
     fn id() -> u8;
@@ -9,10 +12,30 @@ pub trait PacketId {
     }
 }
 
-#[derive(Debug, Clone, BinaryStream)]
+#[derive(Debug, Clone)]
 pub struct Packet {
     pub id: u8,
     pub kind: PacketKind,
+}
+
+impl Streamable for Packet {
+    fn compose(source: &[u8], position: &mut usize) -> Result<Self, error::BinaryError> {
+        // we can silently read the id, but we do NOT want to read it
+        let kind = PacketKind::compose(&source, position)?;
+        Ok(
+            Packet {
+                id: kind.get_id(),
+                kind
+            }
+        )
+    }
+
+    fn parse(&self) -> Result<Vec<u8>, error::BinaryError> {
+        let mut buf = Vec::new();
+        buf.write_u8(self.id).expect("Failed to write id");
+        buf.write_all(&self.kind.parse()?).expect("Failed to write kind");
+        Ok(buf)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -24,6 +47,44 @@ pub enum PacketKind {
     Disconnect(Disconnect),
     ResourcePackInfo(ResourcePackInfo),
     Unknown(Vec<u8>),
+}
+
+macro_rules! impl_from_pkind {
+    ($($kind: ident),*) => {
+        $(
+            impl From<$kind> for Packet {
+                fn from(kind: $kind) -> Self {
+                    Packet {
+                        id: kind.get_id(),
+                        kind: PacketKind::$kind(kind),
+                    }
+                }
+            }
+
+            impl From<$kind> for PacketKind {
+                fn from(kind: $kind) -> Self {
+                    PacketKind::$kind(kind)
+                }
+            }
+
+            impl From<PacketKind> for $kind {
+                fn from(kind: PacketKind) -> Self {
+                    match kind {
+                        PacketKind::$kind(kind) => kind,
+                        _ => panic!("Invalid packet kind"),
+                    }
+                }
+            }
+        )*
+    };
+}
+impl_from_pkind!{
+    Login,
+    ServerToClientHandshake,
+    ClientToServerHandshake,
+    PlayStatus,
+    Disconnect,
+    ResourcePackInfo
 }
 
 impl PacketKind {
@@ -105,3 +166,4 @@ pub fn construct_packet(id: u8, buffer: &[u8]) -> Result<PacketKind, error::Bina
         )),
     }
 }
+

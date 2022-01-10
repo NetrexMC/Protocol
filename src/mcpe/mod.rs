@@ -25,7 +25,7 @@ pub struct Login {
 }
 packet_id!(Login, 0x01);
 
-#[derive(Debug, Clone, BinaryStream)]
+#[derive(Debug, Clone, BinaryStream, PartialEq, PartialOrd)]
 #[repr(u32)]
 pub enum PlayStatus {
     // Failed login
