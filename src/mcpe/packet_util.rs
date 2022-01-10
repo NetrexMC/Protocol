@@ -1,4 +1,4 @@
-use std::{io::Write, fmt};
+use std::{fmt, io::Write};
 
 use super::*;
 use binary_utils::*;
@@ -22,18 +22,17 @@ impl Streamable for Packet {
     fn compose(source: &[u8], position: &mut usize) -> Result<Self, error::BinaryError> {
         // we can silently read the id, but we do NOT want to read it
         let kind = PacketKind::compose(&source, position)?;
-        Ok(
-            Packet {
-                id: kind.get_id(),
-                kind
-            }
-        )
+        Ok(Packet {
+            id: kind.get_id(),
+            kind,
+        })
     }
 
     fn parse(&self) -> Result<Vec<u8>, error::BinaryError> {
         let mut buf = Vec::new();
         buf.write_u8(self.id).expect("Failed to write id");
-        buf.write_all(&self.kind.parse()?).expect("Failed to write kind");
+        buf.write_all(&self.kind.parse()?)
+            .expect("Failed to write kind");
         Ok(buf)
     }
 }
@@ -92,7 +91,7 @@ macro_rules! impl_from_pkind {
         )*
     };
 }
-impl_from_pkind!{
+impl_from_pkind! {
     Login,
     ServerToClientHandshake,
     ClientToServerHandshake,
@@ -111,7 +110,7 @@ impl PacketKind {
             PacketKind::PlayStatus(x) => x.get_id(),
             PacketKind::Disconnect(x) => x.get_id(),
             PacketKind::ResourcePackInfo(x) => x.get_id(),
-            PacketKind::Unknown(x) => 0,
+            PacketKind::Unknown(_) => 0,
         }
     }
 }
@@ -180,4 +179,3 @@ pub fn construct_packet(id: u8, buffer: &[u8]) -> Result<PacketKind, error::Bina
         )),
     }
 }
-

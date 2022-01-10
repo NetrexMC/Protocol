@@ -13,7 +13,6 @@ fn test_status() {
     assert_eq!(PlayStatus::from(pk.kind), status);
 }
 
-
 #[test]
 fn instance_equals_static() {
     assert_eq!(PlayStatus::id(), PlayStatus::Success.get_id());
