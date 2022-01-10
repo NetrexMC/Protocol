@@ -1,50 +1,70 @@
 use super::*;
 use binary_utils::*;
-use byteorder::{WriteBytesExt, ReadBytesExt};
 
-macro_rules! write_packet {
-    ($id: literal, $packet: expr) => {{
-        let mut buffer = Vec::new();
-        buffer.write_u8($id)?;
-        let mut pk = $packet.parse()?;
-        buffer.append(&mut pk);
-        Ok(buffer)
-    }};
-    ($id: literal) => {{
-        let mut buffer = Vec::new();
-        buffer.write_u8($id)?;
-        Ok(buffer)
-    }};
+pub trait PacketId {
+    fn id() -> u8;
+
+    fn get_id(&self) -> u8 {
+        Self::id()
+    }
+}
+
+#[derive(Debug, Clone, BinaryStream)]
+pub struct Packet {
+    pub id: u8,
+    pub kind: PacketKind
 }
 
 #[derive(Debug, Clone)]
-pub enum GamePacket {
+pub enum PacketKind {
     Login(Login),
     ServerToClientHandshake(ServerToClientHandshake),
     ClientToServerHandshake(ClientToServerHandshake),
     PlayStatus(PlayStatus),
     Disconnect(Disconnect),
-    BehaviorPackInfo(BehaviorPackInfo),
-    TexturePackInfo(TexturePackInfo),
     ResourcePackInfo(ResourcePackInfo),
     Unknown(Vec<u8>),
 }
 
-impl Streamable for GamePacket {
+impl PacketKind {
+    pub fn get_id(&self) -> u8 {
+        // get the inner value
+        match self {
+            PacketKind::Login(x) => x.get_id(),
+            PacketKind::ServerToClientHandshake(x) => x.get_id(),
+            PacketKind::ClientToServerHandshake(x) => x.get_id(),
+            PacketKind::PlayStatus(x) => x.get_id(),
+            PacketKind::Disconnect(x) => x.get_id(),
+            PacketKind::ResourcePackInfo(x) => x.get_id(),
+            PacketKind::Unknown(x) => 0,
+        }
+    }
+}
+
+impl Into<Packet> for PacketKind {
+    fn into(self) -> Packet {
+        Packet {
+            id: self.get_id(),
+            kind: self
+        }
+    }
+}
+
+impl Streamable for PacketKind {
     fn parse(&self) -> Result<Vec<u8>, binary_utils::error::BinaryError> {
         match self.clone() {
-            GamePacket::Login(p) => write_packet!(0x01, p),
-            GamePacket::PlayStatus(p) => write_packet!(0x02, p),
-            GamePacket::ServerToClientHandshake(p) => write_packet!(0x03, p),
-            GamePacket::ClientToServerHandshake(p) => write_packet!(0x04, p),
-            GamePacket::Disconnect(p) => write_packet!(0x05, p),
-            GamePacket::ResourcePackInfo(p) => write_packet!(0x06, p),
-            GamePacket::BehaviorPackInfo(p) => write_packet!(0x07, p),
-            GamePacket::TexturePackInfo(p) => write_packet!(0x08, p),
-            GamePacket::Unknown(p) => Ok(p.clone()),
+            PacketKind::Login(p) => p.parse(),
+            PacketKind::PlayStatus(p) => p.parse(),
+            PacketKind::ServerToClientHandshake(p) => p.parse(),
+            PacketKind::ClientToServerHandshake(p) => p.parse(),
+            PacketKind::Disconnect(p) => p.parse(),
+            PacketKind::ResourcePackInfo(p) => p.parse(),
+            PacketKind::Unknown(p) => Ok(p.clone()),
         }
     }
 
+    /// Compose is picky here, it expects the packet id to be the first byte
+    /// So when composing, we need to prepend the packet id
     fn compose(source: &[u8], position: &mut usize) -> Result<Self, error::BinaryError> where Self: Sized {
           let id = source[*position];
           let local = *position + 1;
@@ -57,19 +77,14 @@ impl Streamable for GamePacket {
     }
 }
 
-pub fn construct_packet(id: u8, buffer: &[u8]) -> Result<GamePacket, error::BinaryError> {
-    let res = match id {
-        0x01 => GamePacket::Login(Login::compose(buffer, &mut 0)?),
-        0x02 => GamePacket::PlayStatus(PlayStatus::compose(buffer, &mut 0)?),
-        0x03 => {
-            GamePacket::ServerToClientHandshake(ServerToClientHandshake::compose(buffer, &mut 0)?)
-        }
-        0x04 => {
-            GamePacket::ClientToServerHandshake(ClientToServerHandshake::compose(buffer, &mut 0)?)
-        }
-        0x05 => GamePacket::Disconnect(Disconnect::compose(buffer, &mut 0)?),
-        0x06 => GamePacket::ResourcePackInfo(ResourcePackInfo::compose(buffer, &mut 0)?),
-        _ => GamePacket::Unknown(buffer.to_vec()),
-    };
-     Ok(res)
+pub fn construct_packet(id: u8, buffer: &[u8]) -> Result<PacketKind, error::BinaryError> {
+    match id {
+        x if x == Login::id() => Ok(PacketKind::Login(Login::compose(buffer, &mut 0)?)),
+        x if x == ServerToClientHandshake::id() => Ok(PacketKind::ServerToClientHandshake(ServerToClientHandshake::compose(buffer, &mut 0)?)),
+        x if x == ClientToServerHandshake::id() => Ok(PacketKind::ClientToServerHandshake(ClientToServerHandshake::compose(buffer, &mut 0)?)),
+        x if x == PlayStatus::id() => Ok(PacketKind::PlayStatus(PlayStatus::compose(buffer, &mut 0)?)),
+        x if x == Disconnect::id() => Ok(PacketKind::Disconnect(Disconnect::compose(buffer, &mut 0)?)),
+        x if x == ResourcePackInfo::id() => Ok(PacketKind::ResourcePackInfo(ResourcePackInfo::compose(buffer, &mut 0)?)),
+        _ => Err(error::BinaryError::RecoverableKnown("Packet is not a gamepacket".into())),
+    }
 }

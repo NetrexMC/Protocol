@@ -1,10 +1,20 @@
 pub mod packet;
 use crate::interfaces::{Slice, VarString};
 use binary_utils::*;
-pub use packet::*;
+pub use packet::PacketId;
+
 // This file contains all packet encoding for Netrex
 // Please keep in mind not all of this implmentation is
 // Final, a lot of it is just Wrapper typing.
+macro_rules! packet_id {
+    ($name: ident, $id: literal) => {
+        impl PacketId for $name {
+            fn id() -> u8 {
+                $id
+            }
+        }
+    }
+}
 
 /// Login Packet
 #[derive(Debug, Clone, BinaryStream)]
@@ -12,14 +22,7 @@ pub struct Login {
     pub protocol: u32,
     pub request_data: Slice,
 }
-
-#[derive(Debug, Clone, BinaryStream)]
-pub struct ServerToClientHandshake {
-    pub jwt: Slice,
-}
-
-#[derive(Debug, Clone, BinaryStream)]
-pub struct ClientToServerHandshake {}
+packet_id!(Login, 0x01);
 
 #[derive(Debug, Clone, BinaryStream)]
 #[repr(u32)]
@@ -34,12 +37,24 @@ pub enum PlayStatus {
     EduVanilla = 6,
     ServerFull = 7,
 }
+packet_id!(PlayStatus, 0x02);
+
+#[derive(Debug, Clone, BinaryStream)]
+pub struct ServerToClientHandshake {
+    pub jwt: Slice,
+}
+packet_id!(ServerToClientHandshake, 0x03);
+
+#[derive(Debug, Clone, BinaryStream)]
+pub struct ClientToServerHandshake {}
+packet_id!(ClientToServerHandshake, 0x04);
 
 #[derive(Debug, Clone, BinaryStream)]
 pub struct Disconnect {
     pub hide_screen: bool,
     pub message: VarString,
 }
+packet_id!(Disconnect, 0x05);
 
 // Resource packs {{
 #[derive(Debug, Clone, BinaryStream)]
@@ -52,6 +67,7 @@ pub struct BehaviorPackInfo {
     pub content_id: VarString,
     pub has_scripts: bool,
 }
+
 
 #[derive(Debug, Clone, BinaryStream)]
 pub struct TexturePackInfo {
@@ -73,4 +89,5 @@ pub struct ResourcePackInfo {
     pub texture_packs: Slice,
     pub force_packs: bool,
 }
+packet_id!(ResourcePackInfo, 0x06);
 // }}
