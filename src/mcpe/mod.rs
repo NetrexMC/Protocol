@@ -3,7 +3,6 @@ pub use packet_util::*;
 
 use crate::interfaces::{Slice, VarString};
 use binary_utils::*;
-use packet_util::PacketId;
 
 // This file contains all packet encoding for Netrex
 // Please keep in mind not all of this implmentation is
@@ -15,7 +14,7 @@ macro_rules! packet_id {
                 $id
             }
         }
-    }
+    };
 }
 
 /// Login Packet
@@ -69,7 +68,6 @@ pub struct BehaviorPackInfo {
     pub content_id: VarString,
     pub has_scripts: bool,
 }
-
 
 #[derive(Debug, Clone, BinaryStream)]
 pub struct TexturePackInfo {
