@@ -62,6 +62,12 @@ impl fmt::Display for PacketKind {
     }
 }
 
+impl From<PacketKind> for String {
+    fn from(kind: PacketKind) -> Self {
+        format!("{}", kind)
+    }
+}
+
 macro_rules! impl_from_pkind {
     ($($kind: ident),*) => {
         $(
