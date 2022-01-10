@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::{io::Write, fmt};
 
 use super::*;
 use binary_utils::*;
@@ -47,6 +47,20 @@ pub enum PacketKind {
     Disconnect(Disconnect),
     ResourcePackInfo(ResourcePackInfo),
     Unknown(Vec<u8>),
+}
+
+impl fmt::Display for PacketKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PacketKind::Login(_) => write!(f, "Login"),
+            PacketKind::ServerToClientHandshake(_) => write!(f, "ServerToClientHandshake"),
+            PacketKind::ClientToServerHandshake(_) => write!(f, "ClientToServerHandshake"),
+            PacketKind::PlayStatus(_) => write!(f, "PlayStatus"),
+            PacketKind::Disconnect(_) => write!(f, "Disconnect"),
+            PacketKind::ResourcePackInfo(_) => write!(f, "ResourcePackInfo"),
+            PacketKind::Unknown(_) => write!(f, "Unknown"),
+        }
+    }
 }
 
 macro_rules! impl_from_pkind {
