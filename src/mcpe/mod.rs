@@ -1,9 +1,9 @@
-mod packet;
-pub use packet::*;
+pub mod packet_util;
+pub use packet_util::*;
 
 use crate::interfaces::{Slice, VarString};
 use binary_utils::*;
-use packet::PacketId;
+use packet_util::PacketId;
 
 // This file contains all packet encoding for Netrex
 // Please keep in mind not all of this implmentation is
