@@ -2,7 +2,6 @@ use std::{fmt, io::Write};
 
 use super::*;
 use binary_utils::*;
-use byteorder::{BigEndian, WriteBytesExt};
 
 pub trait PacketId {
     fn id() -> u32;
@@ -17,10 +16,6 @@ pub struct Packet {
     /// The actual ID of the packet we're decoding/sending
     pub id: u32,
     /// The kind of packet, this is a wrapper around the actual packet.
-    /// For instance...
-    /// ```rust
-    /// use mcpe_packet::packet::*;
-    /// PacketKind::from(PlayStatus::Success);
     pub kind: PacketKind,
     /// The sender subclient is the co-op player that sent the packet, for instance:
     /// If we have "Steve" on the left side and "Alex" on the right,
@@ -49,14 +44,21 @@ impl Streamable for Packet {
 
     fn parse(&self) -> Result<Vec<u8>, error::BinaryError> {
         let mut buf = Vec::new();
-        buf.write_u32::<BigEndian>(self.id | (0 << 10) | (0 << 12))
-            .expect("Failed to write id");
-        buf.write_all(&self.kind.parse()?)
-            .expect("Failed to write kind");
+        buf.write_all(&VarInt::<u32>(self.id | (0 << 10) | (0 << 12)).parse()?)?;
+        buf.write_all(&self.kind.parse()?)?;
         Ok(buf)
     }
 }
 
+/// A wrapper for all existing packets.
+/// This is used as a "type union".
+///
+/// You should not instance this struct directly, but rather, instance it with the `into` method.
+/// For Example:
+/// ```rust
+/// use mcpe_protocol::mcpe::packet::*;
+/// let packet: Packet = PlayStatus::NotEdu.into(); // Packet
+/// ```
 #[derive(Debug, Clone)]
 pub enum PacketKind {
     Login(Login),
@@ -177,8 +179,7 @@ impl Streamable for PacketKind {
         // todo: This is going to cause problems in the future, but the subclient and subtarget need to
         // todo: be handled
         let id = flags.0 & 0x3ff;
-        let local = *position + 4;
-        if let Ok(res) = construct_packet(id, &source[local..]) {
+        if let Ok(res) = construct_packet(id, &source[*position..]) {
             *position += res.parse()?.len();
             return Ok(res);
         } else {

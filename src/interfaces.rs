@@ -43,11 +43,13 @@ impl Streamable for Slice {
 /// A helper struct to read/write Strings with
 /// varint encoded lengths.
 ///
-/// **Example:**
-/// ```rust ignore
+/// ```rust
+/// use mcpe_protocol::interfaces::VarString;
+/// use binary_utils::*;
+///
 /// let my_string = "Hello World!".to_string();
-/// let encoded = VarString(my_string).parse();
-/// [12, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33]
+/// let encoded = VarString(my_string).fparse();
+/// assert_eq!(encoded, &[12, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33])
 /// ```
 #[derive(Debug, Clone)]
 pub struct VarString(pub String);
