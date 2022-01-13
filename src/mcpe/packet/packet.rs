@@ -2,20 +2,37 @@ use std::{fmt, io::Write};
 
 use super::*;
 use binary_utils::*;
-use byteorder::WriteBytesExt;
+use byteorder::{BigEndian, WriteBytesExt};
 
 pub trait PacketId {
-    fn id() -> u8;
+    fn id() -> u32;
 
-    fn get_id(&self) -> u8 {
+    fn get_id(&self) -> u32 {
         Self::id()
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct Packet {
-    pub id: u8,
+    /// The actual ID of the packet we're decoding/sending
+    pub id: u32,
+    /// The kind of packet, this is a wrapper around the actual packet.
+    /// For instance...
+    /// ```rust
+    /// use mcpe_packet::packet::*;
+    /// PacketKind::from(PlayStatus::Success);
     pub kind: PacketKind,
+    /// The sender subclient is the co-op player that sent the packet, for instance:
+    /// If we have "Steve" on the left side and "Alex" on the right,
+    /// This would be "Steve" if Steve sent the packet.
+    ///
+    /// It is important to note, that netrex ignores this field.
+    pub send_sub_client: u8,
+    /// The receiver subclient is the co-op player that should receive the packet, for instance:
+    /// Using the same example above, this would be "Steve" again, if Steve sent the packet.
+    ///
+    /// It is important to note, that netrex ignores this field.
+    pub target_sub_client: u8,
 }
 
 impl Streamable for Packet {
@@ -25,12 +42,15 @@ impl Streamable for Packet {
         Ok(Packet {
             id: kind.get_id(),
             kind,
+            send_sub_client: 0,
+            target_sub_client: 0,
         })
     }
 
     fn parse(&self) -> Result<Vec<u8>, error::BinaryError> {
         let mut buf = Vec::new();
-        buf.write_u8(self.id).expect("Failed to write id");
+        buf.write_u32::<BigEndian>(self.id | (0 << 10) | (0 << 12))
+            .expect("Failed to write id");
         buf.write_all(&self.kind.parse()?)
             .expect("Failed to write kind");
         Ok(buf)
@@ -76,6 +96,8 @@ macro_rules! impl_from_pkind {
                     Packet {
                         id: kind.get_id(),
                         kind: PacketKind::$kind(kind),
+                        send_sub_client: 0,
+                        target_sub_client: 0
                     }
                 }
             }
@@ -107,7 +129,7 @@ impl_from_pkind! {
 }
 
 impl PacketKind {
-    pub fn get_id(&self) -> u8 {
+    pub fn get_id(&self) -> u32 {
         // get the inner value
         match self {
             PacketKind::Login(x) => x.get_id(),
@@ -126,6 +148,8 @@ impl Into<Packet> for PacketKind {
         Packet {
             id: self.get_id(),
             kind: self,
+            send_sub_client: 0,
+            target_sub_client: 0,
         }
     }
 }
@@ -149,8 +173,11 @@ impl Streamable for PacketKind {
     where
         Self: Sized,
     {
-        let id = source[*position];
-        let local = *position + 1;
+        let flags = VarInt::<u32>::compose(source, position)?;
+        // todo: This is going to cause problems in the future, but the subclient and subtarget need to
+        // todo: be handled
+        let id = flags.0 & 0x3ff;
+        let local = *position + 4;
         if let Ok(res) = construct_packet(id, &source[local..]) {
             *position += res.parse()?.len();
             return Ok(res);
@@ -162,7 +189,7 @@ impl Streamable for PacketKind {
     }
 }
 
-pub fn construct_packet(id: u8, buffer: &[u8]) -> Result<PacketKind, error::BinaryError> {
+pub fn construct_packet(id: u32, buffer: &[u8]) -> Result<PacketKind, error::BinaryError> {
     match id {
         x if x == Login::id() => Ok(PacketKind::Login(Login::compose(buffer, &mut 0)?)),
         x if x == ServerToClientHandshake::id() => Ok(PacketKind::ServerToClientHandshake(
