@@ -29,8 +29,19 @@ impl Batch {
         }
     }
 
+    /// Gets the amount of packets that can be sent in this batch
     pub fn get_limit(&self) -> usize {
         return self.limit.clone();
+    }
+
+    /// Gets the amount of packets that are currently in this batch
+    pub fn get_size(&self) -> usize {
+        return self.packets.len();
+    }
+
+    /// Gets the amount of packets that can be added to this batch
+    pub fn get_remaining(&self) -> usize {
+        return self.limit - self.packets.len();
     }
 
     pub fn add(&mut self, packet: Packet) -> bool {
