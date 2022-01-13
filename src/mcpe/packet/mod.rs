@@ -1,5 +1,6 @@
 pub mod batch;
 pub mod packet;
+pub use batch::*;
 pub use packet::*;
 
 use crate::interfaces::{Slice, VarString};
