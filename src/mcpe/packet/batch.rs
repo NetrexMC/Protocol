@@ -29,6 +29,10 @@ impl Batch {
         }
     }
 
+    pub fn get_limit(&self) -> usize {
+        return self.limit.clone();
+    }
+
     pub fn add(&mut self, packet: Packet) -> bool {
         if self.packets.len() >= self.limit {
             return false;
