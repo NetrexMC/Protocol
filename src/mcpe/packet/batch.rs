@@ -81,7 +81,6 @@ impl Streamable for Batch {
 
     fn parse(&self) -> Result<Vec<u8>, binary_utils::error::BinaryError> {
         let mut buf: Vec<u8> = Vec::new();
-        buf.write_u8(254)?; // this is a test
         for packet in &self.packets {
             buf.write_all(&packet.parse()?)?;
         }
