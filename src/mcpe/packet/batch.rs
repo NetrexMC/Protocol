@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use binary_utils::Streamable;
-use byteorder::WriteBytesExt;
+// use byteorder::WriteBytesExt;
 
 use super::Packet;
 
@@ -63,14 +63,6 @@ impl Streamable for Batch {
         source: &[u8],
         position: &mut usize,
     ) -> Result<Self, binary_utils::error::BinaryError> {
-        let id = u8::compose(&source, position)?;
-        if id != 254 {
-            return Err(binary_utils::error::BinaryError::RecoverableKnown(format!(
-                "Invalid packet ID: {}",
-                id
-            )));
-        }
-        println!("Offset: {} buffer: {:#?}", *position, &source[*position..]);
         let mut packets: Vec<Packet> = Vec::new();
         loop {
             // let's read a unsigned var int
@@ -88,7 +80,7 @@ impl Streamable for Batch {
     }
 
     fn parse(&self) -> Result<Vec<u8>, binary_utils::error::BinaryError> {
-        let mut buf: Vec<u8> = vec![254];
+        let mut buf: Vec<u8> = Vec::new();
         for packet in &self.packets {
             buf.write_all(&packet.parse()?)?;
         }
@@ -101,14 +93,6 @@ impl From<Vec<u8>> for Batch {
     fn from(buffer: Vec<u8>) -> Self {
         let mut packets: Vec<Packet> = Vec::new();
         let mut position: usize = 0;
-        let id = u8::compose(&buffer, &mut position).unwrap();
-        if id != 254 {
-            return Err(binary_utils::error::BinaryError::RecoverableKnown(format!(
-                "Invalid packet ID: {}",
-                id
-            )))
-            .unwrap();
-        }
         loop {
             // let's read a unsigned var int
             if position >= buffer.len() {
