@@ -176,6 +176,7 @@ impl Streamable for PacketKind {
         Self: Sized,
     {
         let flags = VarInt::<u32>::compose(source, position)?;
+        dbg!(&flags);
         // todo: This is going to cause problems in the future, but the subclient and subtarget need to
         // todo: be handled
         let id = flags.0 & 0x3ff;
@@ -183,9 +184,10 @@ impl Streamable for PacketKind {
             *position += res.parse()?.len();
             return Ok(res);
         } else {
-            return Err(binary_utils::error::BinaryError::RecoverableKnown(
-                "Packet is not a gamepacket".into(),
-            ));
+            return Err(binary_utils::error::BinaryError::RecoverableKnown(format!(
+                "Packet {} is not a gamepacket",
+                id
+            )));
         }
     }
 }
