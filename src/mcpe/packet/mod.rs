@@ -29,7 +29,7 @@ pub struct Login {
 packet_id!(Login, 0x01);
 
 #[derive(Debug, Clone, BinaryStream, PartialEq, PartialOrd)]
-#[repr(u32)]
+#[repr(u64)]
 pub enum PlayStatus {
     /// The client can successfully join the game
     Success = 0,
