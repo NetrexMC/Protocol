@@ -5,7 +5,7 @@ use binary_utils::*;
 use std::{convert::TryInto, io::Write};
 
 /// A 3 - 15 byte struct
-#[derive(Copy, Clone, BinaryStream)]
+#[derive(Copy, Debug, Clone, BinaryStream)]
 pub struct Coordinates {
     pub x: i64,
     pub y: i64,
@@ -13,7 +13,7 @@ pub struct Coordinates {
 }
 
 /// 15 byte structure for location
-#[derive(Copy, Clone, BinaryStream)]
+#[derive(Copy, Debug, Clone, BinaryStream)]
 pub struct Location {
     pub x: f32,
     pub y: f32,

@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use binary_utils::Streamable;
+use binary_utils::{Streamable, VarInt};
 // use byteorder::WriteBytesExt;
 
 use super::Packet;
@@ -65,12 +65,21 @@ impl Streamable for Batch {
     ) -> Result<Self, binary_utils::error::BinaryError> {
         let mut packets: Vec<Packet> = Vec::new();
         loop {
-            // let's read a unsigned var int
             if *position >= source.len() {
                 break;
             }
 
-            packets.push(Packet::compose(&source, position)?);
+            // let's read a unsigned var int, this is the length
+            // of the packet.
+            let length = VarInt::<u32>::compose(&source, position)?;
+            let to = length.0 as usize + *position;
+
+            // this is a hack but will be removed once we fully have all packets implemented.
+            if let Ok(packet) = Packet::compose(&source[*position..to], position) {
+                packets.push(packet);
+            }
+
+            *position += length.0 as usize;
         }
         let length = packets.len();
         Ok(Self {
@@ -82,7 +91,9 @@ impl Streamable for Batch {
     fn parse(&self) -> Result<Vec<u8>, binary_utils::error::BinaryError> {
         let mut buf: Vec<u8> = Vec::new();
         for packet in &self.packets {
-            buf.write_all(&packet.parse()?)?;
+            let data = packet.parse()?;
+            buf.write_all(&VarInt::<u32>(data.len() as u32).parse()?[..])?;
+            buf.write_all(&data)?;
         }
 
         Ok(buf)

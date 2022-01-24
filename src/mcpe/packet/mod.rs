@@ -3,7 +3,7 @@ pub mod packet;
 pub use batch::*;
 pub use packet::*;
 
-use crate::interfaces::{Slice, VarString};
+use crate::interfaces::{Coordinates, Slice, VarString};
 
 use binary_utils::*;
 
@@ -102,4 +102,14 @@ pub struct ResourcePackInfo {
     pub force_packs: bool,
 }
 packet_id!(ResourcePackInfo, 0x06);
+
+// We're not actually going to be using this packet
+// it's here simply so we can decode batch packets.
+#[derive(Debug, Clone, BinaryStream)]
+pub struct LabTable {
+    pub action: u64,
+    pub block_pos: Coordinates,
+    pub reaction: u64,
+}
+packet_id!(LabTable, 0x6D);
 // }}

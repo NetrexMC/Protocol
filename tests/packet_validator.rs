@@ -29,4 +29,6 @@ fn test_batch_packet_reconstruct_self() {
         let packet: PlayStatus = pk.clone().kind.into();
         assert_eq!(packet, PlayStatus::NotEdu);
     });
+
+    println!("{:?}", result);
 }
