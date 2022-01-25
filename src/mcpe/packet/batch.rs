@@ -75,8 +75,11 @@ impl Streamable for Batch {
             let to = length.0 as usize + *position;
 
             // this is a hack but will be removed once we fully have all packets implemented.
-            if let Ok(packet) = Packet::compose(&source[*position..to], position) {
+            let res = Packet::compose(&source[*position..to], &mut 0);
+            if let Ok(packet) = res {
                 packets.push(packet);
+            } else if let Err(er) = res {
+                println!("{}", er);
             }
 
             *position += length.0 as usize;
@@ -90,6 +93,7 @@ impl Streamable for Batch {
 
     fn parse(&self) -> Result<Vec<u8>, binary_utils::error::BinaryError> {
         let mut buf: Vec<u8> = Vec::new();
+
         for packet in &self.packets {
             let data = packet.parse()?;
             buf.write_all(&VarInt::<u32>(data.len() as u32).parse()?[..])?;
@@ -97,29 +101,5 @@ impl Streamable for Batch {
         }
 
         Ok(buf)
-    }
-}
-
-impl From<Vec<u8>> for Batch {
-    fn from(buffer: Vec<u8>) -> Self {
-        let mut packets: Vec<Packet> = Vec::new();
-        let mut position: usize = 0;
-        loop {
-            // let's read a unsigned var int
-            if position >= buffer.len() {
-                break;
-            }
-            if let Ok(packet) = Packet::compose(&buffer, &mut position) {
-                packets.push(packet);
-            } else {
-                break;
-            }
-        }
-
-        let length = packets.len();
-        Self {
-            packets,
-            limit: length,
-        }
     }
 }
