@@ -63,7 +63,7 @@ impl VarString {
 impl Streamable for VarString {
     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
         // read the length in var ints
-        let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
+        let length = VarInt::<u32>::from_be_bytes(&source[*position..])?;
         // increase the offset byte the length of bytes the varint is.
         *position += length.get_byte_length() as usize;
         let contents = &source[*position..(*position + length.0 as usize)];
@@ -142,7 +142,7 @@ impl VarSlice {
 impl Streamable for VarSlice {
     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
         // read the length in var ints
-        let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
+        let length = VarInt::<u32>::from_be_bytes(&source[*position..])?;
         *position += length.get_byte_length() as usize;
         let from = *position;
         let to = length.0 as usize + *position;
@@ -196,7 +196,7 @@ where
 {
     fn compose(source: &[u8], position: &mut usize) -> Result<Self, BinaryError> {
         // read the length in var ints
-        let length = VarInt::<u32>::from_be_bytes(&source[*position..]);
+        let length = VarInt::<u32>::from_be_bytes(&source[*position..])?;
         // Update the position to consume the length of the varint.
         *position += length.get_byte_length() as usize;
 
