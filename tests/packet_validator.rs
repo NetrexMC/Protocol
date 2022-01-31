@@ -20,13 +20,11 @@ fn instance_equals_static() {
 
 #[test]
 fn read_send() {
-    let bytes = vec![5, 2, 0, 0, 0, 2];
+    let bytes = vec![5, 2, 0, 0, 0, 2, 5, 2, 0, 0, 0, 2];
     let batch = Batch::compose(&bytes[..], &mut 0).unwrap();
-    println!("{:?}", batch);
-
+    println!("{:?}", batch.get_packets());
     let mut new_batch = Batch::new(200);
     new_batch.add(PlayStatus::FailedServer.into());
-    println!("{:?}", new_batch.fparse());
 }
 
 #[test]
