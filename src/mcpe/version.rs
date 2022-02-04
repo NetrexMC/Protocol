@@ -63,10 +63,10 @@ pub enum Versions {
     V1_16_0 = 407,
 }
 
-pub fn version_within_current_patch(version: u16) -> bool {
+pub fn version_within_current_patch(version: u32) -> bool {
     version >= CURRENT_MAJOR && version <= CURRENT_PATCH
 }
 
-pub fn version_within_current_minor(version: u16) -> bool {
+pub fn version_within_current_minor(version: u32) -> bool {
     version >= CURRENT_MAJOR && version <= CURRENT_MINOR
 }
