@@ -3,7 +3,7 @@ name = "mcpe_protocol"
 version = "0.1.0"
 authors = ["Bavfalcon9"]
 edition = "2018"
-
+include = ["src/**", "tests/**", "README.md"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
