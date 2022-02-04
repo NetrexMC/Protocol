@@ -3,15 +3,15 @@
 // To add versions, add a version to the resources/versions.json file!
 
 /// The current minecraft patch version (1.10.2.x)
-pub const CURRENT_PATCH: u16 = 491;
+pub const CURRENT_PATCH: u32 = 491;
 /// The current minecraft minor version (1.10.x)
-pub const CURRENT_MINOR: u16 = 475;
+pub const CURRENT_MINOR: u32 = 475;
 /// The current minecraft major version (1.x.0)
-pub const CURRENT_MAJOR: u16 = 475;
+pub const CURRENT_MAJOR: u32 = 475;
 
 /// This is a helper enum to get a version number from a version string.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-#[repr(u16)]
+#[repr(u32)]
 pub enum Versions {
     V1_18_20_24 = 491,
     V1_18_20_23 = 490,
