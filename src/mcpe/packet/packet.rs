@@ -65,6 +65,7 @@ pub enum PacketKind {
     ServerToClientHandshake(ServerToClientHandshake),
     ClientToServerHandshake(ClientToServerHandshake),
     PlayStatus(PlayStatus),
+    RequestNetworkSettings(RequestNetworkSettings),
     Disconnect(Disconnect),
     ResourcePackInfo(ResourcePackInfo),
     Unknown(Vec<u8>),
@@ -77,6 +78,7 @@ impl fmt::Display for PacketKind {
             PacketKind::ServerToClientHandshake(_) => write!(f, "ServerToClientHandshake"),
             PacketKind::ClientToServerHandshake(_) => write!(f, "ClientToServerHandshake"),
             PacketKind::PlayStatus(_) => write!(f, "PlayStatus"),
+            PacketKind::RequestNetworkSettings(_) => write!(f, "RequestnetworkSettings"),
             PacketKind::Disconnect(_) => write!(f, "Disconnect"),
             PacketKind::ResourcePackInfo(_) => write!(f, "ResourcePackInfo"),
             PacketKind::Unknown(_) => write!(f, "Unknown"),
@@ -126,6 +128,7 @@ impl_from_pkind! {
     ServerToClientHandshake,
     ClientToServerHandshake,
     PlayStatus,
+    RequestNetworkSettings,
     Disconnect,
     ResourcePackInfo
 }
@@ -138,6 +141,7 @@ impl PacketKind {
             PacketKind::ServerToClientHandshake(x) => x.get_id(),
             PacketKind::ClientToServerHandshake(x) => x.get_id(),
             PacketKind::PlayStatus(x) => x.get_id(),
+            PacketKind::RequestNetworkSettings(x) => x.get_id(),
             PacketKind::Disconnect(x) => x.get_id(),
             PacketKind::ResourcePackInfo(x) => x.get_id(),
             PacketKind::Unknown(_) => 0,
@@ -161,6 +165,7 @@ impl Streamable for PacketKind {
         match self.clone() {
             PacketKind::Login(p) => p.parse(),
             PacketKind::PlayStatus(p) => p.parse(),
+            PacketKind::RequestNetworkSettings(p) => p.parse(),
             PacketKind::ServerToClientHandshake(p) => p.parse(),
             PacketKind::ClientToServerHandshake(p) => p.parse(),
             PacketKind::Disconnect(p) => p.parse(),
@@ -203,6 +208,9 @@ pub fn construct_packet(id: u32, buffer: &[u8]) -> Result<PacketKind, error::Bin
         x if x == PlayStatus::id() => {
             Ok(PacketKind::PlayStatus(PlayStatus::compose(buffer, &mut 0)?))
         }
+        x if x == RequestNetworkSettings::id() => Ok(PacketKind::RequestNetworkSettings(
+            RequestNetworkSettings::compose(buffer, &mut 0)?,
+        )),
         x if x == Disconnect::id() => {
             Ok(PacketKind::Disconnect(Disconnect::compose(buffer, &mut 0)?))
         }

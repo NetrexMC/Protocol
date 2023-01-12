@@ -1,5 +1,5 @@
 use binary_utils::*;
-use mcpe_protocol::mcpe::{batch::Batch, packet::*};
+use mcpe_protocol::mcpe::{batch::Batch, packet::{*, packet::PacketId}};
 
 /// Tests that login packet is equal to that of the one recieved in packet kind
 #[test]

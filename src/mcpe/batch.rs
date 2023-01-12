@@ -3,7 +3,7 @@ use std::io::Write;
 use binary_utils::{Streamable, VarInt};
 // use byteorder::WriteBytesExt;
 
-use super::Packet;
+use super::packet::Packet;
 
 /// A packet batch, (batch packet)
 /// This is a wrapper for game packets, and is used to send multiple packets
