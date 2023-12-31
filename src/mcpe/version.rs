@@ -3,16 +3,39 @@
 // To add versions, add a version to the resources/versions.json file!
 
 /// The current minecraft patch version (1.10.2.x)
-pub const CURRENT_PATCH: u32 = 563;
+pub const CURRENT_PATCH: u32 = 622;
 /// The current minecraft minor version (1.10.x)
-pub const CURRENT_MINOR: u32 = 560;
+pub const CURRENT_MINOR: u32 = 594;
 /// The current minecraft major version (1.x.0)
-pub const CURRENT_MAJOR: u32 = 526;
+pub const CURRENT_MAJOR: u32 = 589;
 
 /// This is a helper enum to get a version number from a version string.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 #[repr(u32)]
 pub enum Versions {
+    V1_20_40_21 = 622,
+    V1_20_40_20 = 620,
+    V1_20_30_25 = 613,
+    V1_20_30_21 = 612,
+    V1_20_20_23 = 609,
+    V1_20_20_22 = 607,
+    V1_20_20_21 = 606,
+    V1_20_20_20 = 598,
+    V1_20_15 = 594,
+    V1_20_10_25 = 593,
+    V1_20_10_20 = 592,
+    V1_20_0 = 589,
+    V1_20_0_25 = 588,
+    V1_20_0_23 = 586,
+    V1_20_0_20 = 585,
+    V1_19_83 = 582,
+    V1_19_80_24 = 579,
+    V1_19_73 = 575,
+    V1_19_70_26 = 574,
+    V1_19_70_24 = 573,
+    V1_19_70_22 = 571,
+    V1_19_70_21 = 569,
+    V1_19_60_25 = 565,
     V1_19_60_24 = 563,
     V1_19_60_23 = 562,
     V1_19_60_20 = 561,

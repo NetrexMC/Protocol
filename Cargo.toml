@@ -6,9 +6,14 @@ edition = "2018"
 include = ["src/**", "tests/**", "README.md"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+zip = []
+default = ["zip"]
+
 [dependencies]
+binary-util = { version = "0.3.4" }
 # Hard depend on binary_utils
-binary_utils = { git = "https://github.com/NetrexMC/BinaryUtil", tag = "v0.2.2" }
 byteorder = "1.4.3"
+flate2 = { version = "1.0.28", features = [ "zlib" ] }
 glm = "0.2.3"
 serde_json = "1.0.66"

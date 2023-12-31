@@ -1,11 +1,11 @@
-use binary_utils::*;
-use super::packet::*;
-use crate::{packet_id, interfaces::Slice};
+use binary_util::BinaryIo;
 
-/// Login Packet
-#[derive(Debug, Clone, BinaryStream)]
+#[derive(BinaryIo, Debug, Clone)]
 pub struct Login {
-    pub protocol: u32,
-    pub request_data: Slice,
+    /// This is the protocol version of the client connecting.
+    /// You can verify if this version is allowed by using `mcpe::version_within_current_patch(pk.version)`.
+    pub version: i32,
+    /// This is the client chain data.
+    /// For sake of myself i'm not going to document this.
+    pub chain_data: Vec<u8>,
 }
-packet_id!(Login, 0x01);
